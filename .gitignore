@@ -1,2 +1,8 @@
 
 .DS_Store
+*.iml
+.idea/encodings.xml
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
