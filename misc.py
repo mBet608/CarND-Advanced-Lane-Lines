@@ -1,5 +1,6 @@
 import os
 import matplotlib.pyplot as plt
+import cv2
 
 def getFileRelativeFilepathsInDirectory(dirName: str) -> [str]:
     """
@@ -29,3 +30,26 @@ def showBeforeAfter(beforeImg, beforeTitle: str, afterImg, afterTitle: str):
     ax1.set_title(beforeTitle, fontsize=50)
     ax2.imshow(afterImg)
     ax2.set_title(afterTitle, fontsize=50)
+    return f
+
+def showImageInNewFigure(image, title):
+    plt.figure(title)
+    plt.tight_layout()
+    plt.imshow(image)
+    plt.title(title)
+
+def getFilenameFromPath(path):
+    return os.path.basename(path)
+
+def showFigureUntilKeyHit():
+    plt.waitforbuttonpress()
+
+def putTextInImage(image, text, pos):
+    cv2.putText(
+        image,
+        text,
+        pos,
+        cv2.FONT_HERSHEY_DUPLEX,
+        1,  # font size
+        (0, 0, 0, 255),  # font color
+        2)  # font stroke

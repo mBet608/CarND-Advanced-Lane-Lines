@@ -1,7 +1,10 @@
 import numpy as np
+import misc
 
 import os
 import cv2
+
+debugFolder = 'debugOutput/'
 
 class CameraCalibrator:
     def __init__(self):
@@ -18,7 +21,7 @@ class CameraCalibrator:
         self._tvecs = None
         self._isCalibrated = False
 
-    def calibCamera(self, calibrationCatalog: [str], nx: int, ny: int) -> bool:
+    def calibCamera(self, calibrationCatalog: [str], nx: int, ny: int, verbose = False) -> bool:
         '''
         Calibrates a camera with a given set of chessboard pictures.
         :param calibrationCatalog: List of calibration image filenames (absolute or relative)
@@ -48,11 +51,16 @@ class CameraCalibrator:
             gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
             # Find the chessboard corners
             ret, corners = cv2.findChessboardCorners(gray, (nx, ny), None)
-            # If found, draw corners
+            # If found add them to the list
             if ret == True:
                 # Append found image points plus standard object points
                 imgPts.append(corners)
                 objPts.append(objP)
+                # If verbose is ON, let's draw the images and store them
+                if verbose:
+                    cv2.drawChessboardCorners(image, (nx, ny), corners, ret)
+                    filename = debugFolder + 'chessboardCorners_' + misc.getFilenameFromPath(imageFilename)
+                    cv2.imwrite(filename, image)
         # Determine calibration parameters and store them
         self._isCalibrated, self._mtx, self._dist, self._rvecs, self._tvecs = cv2.calibrateCamera(objPts, imgPts, cameraShape[1::-1], None, None)
         return self._isCalibrated
@@ -75,7 +83,7 @@ class CameraCalibrator:
 
 if __name__ == "__main__":
     # Load to be undistort image
-    distortedImage = cv2.cvtColor(cv2.imread("test_images/test1.jpg"), cv2.COLOR_BGR2RGB)
+    distortedImage = cv2.cvtColor(cv2.imread("test_images/straight_lines1.jpg"), cv2.COLOR_BGR2RGB)
     # Make a list of calibration images
     import misc
     calibrationCatalog = misc.getFileRelativeFilepathsInDirectory("camera_cal/")
@@ -85,13 +93,13 @@ if __name__ == "__main__":
     # Init camera calibrator up and running
     camCalib = CameraCalibrator()
     # Try camera calibration
-    if camCalib.calibCamera(calibrationCatalog,nx,ny):
+    if camCalib.calibCamera(calibrationCatalog,nx,ny, True):
         print("Camera Calibration successful")
         # Use calibrator to undistort image
         undistorted = camCalib.undistortImage(distortedImage)
         # Show distorted and undistorted next to each other
-        misc.showBeforeAfter(distortedImage, "Original", undistorted, "Undistorted")
+        f = misc.showBeforeAfter(distortedImage, "Original", undistorted, "Undistorted")
+        f.savefig(debugFolder + 'beforeAfter_distortion.png')
+        # Save it to debugFolder
     else:
         print("Failed")
-
-    debuggerBreakPoint =5
