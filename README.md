@@ -105,6 +105,7 @@ The final result looks like this:
 #### 1. Applied on the "project_video.mp4""
 [See the video here](test_videos_output/project_video.mp4)
 
+![](test_videos_output/project_video.gif)
 
 
 ---
